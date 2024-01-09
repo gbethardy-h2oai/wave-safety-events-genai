@@ -1,0 +1,35 @@
+[App]
+Name = "ai.h2o.wave.healthcare-safety-events"
+Version = "0.0.1"
+Title = "Patient and Employee Healthcare Safety Event Classifier"
+Description = "Visually explore and manage patient abd employee healthcare safety event classifications and explanations"
+LongDescription = "docs/description_for_safety_events_classifier.md"
+Tags = ["Healthcare", "Generative AI"]
+#InstanceLifecycle = "MANAGED"
+
+[Runtime]
+Module = "src.app"
+EnableOIDC = false
+MemoryLimit = "16Gi"
+MemoryReservation = "16Gi"
+RoutingMode = "BASE_URL"
+RuntimeVersion = "deb11_py310_wlatest"
+
+[[Env]]
+Name= "COLLECTION_NAME"
+Value = "Safety Events"
+
+[[Env]]
+Name = "H2OGPTE_API_KEY"
+Secret = "h2o-safety-events"
+SecretKey = "h2ogpte-api-key"
+
+[[Env]]
+Name = "H2OGPTE_ADDRESS"
+Secret = "h2o-safety-events"
+SecretKey = "h2ogpte-address"
+
+#[[Env]]
+#Name = "HEAP_ID"
+#Secret = "heap-analytics"
+#SecretKey = "id"

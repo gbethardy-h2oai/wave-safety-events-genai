@@ -1,0 +1,7 @@
+h2o_wave==1.0.0
+pandas
+numpy
+h2ogpte
+scikit-learn
+toml
+loguru
