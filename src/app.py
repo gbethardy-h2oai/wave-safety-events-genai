@@ -154,22 +154,6 @@ async def serve(q: Q):
             else:
                 q.client.prompt_catalog.loc[q.client.prompt_catalog['Prompt_Type'] == 'email', 'Default'] = False
 
-        # Get the max Prompt_ID for the Prompt_type for the new entry in the Prompt Catalog
-        #max_classification_prompt_id = q.client.prompt_catalog[q.client.prompt_catalog['Prompt_Type'] =='classification']['Prompt_ID'].max()
-        #max_email_prompt_id = q.client.prompt_catalog[q.client.prompt_catalog['Prompt_Type'] == 'email']['Prompt_ID'].max()
-        #print (f"max email prompt ID: {max_email_prompt_id}")
-        #current_prompt_id = q.client.prompt_catalog.iloc[int(q.client.prompt_row)]['Prompt_ID'].max()
-        #print(f"max current prompt ID: {current_prompt_id}")
-        # if q.client.prompt_catalog.iloc[int(q.client.prompt_row)]['Prompt_Type'] == 'classification':
-        #     if current_prompt_id == max_classification_prompt_id:
-        #         new_prompt_id = current_prompt_id + 1
-        #     else:
-        #         new_prompt_id = int(max_email_prompt_id) + 1
-        # else:
-        #     if current_prompt_id == max_email_prompt_id:
-        #         new_prompt_id = current_prompt_id + 1
-        #     else:
-        #         new_prompt_id = int(max_classification_prompt_id) + 1
         new_prompt_id = int(q.client.prompt_catalog['Prompt_ID'].max()) + 1
         #print(f"new prompt ID: {new_prompt_id}")
 
@@ -187,9 +171,9 @@ async def serve(q: Q):
         await nav_catalog(q)
 
 
+    
     elif q.args.cancel_prompt_edits:
         await nav_catalog(q)
-
 
 
     elif q.args.generate_response:
@@ -236,8 +220,8 @@ async def init(q: Q) -> None:
 
         # Set the h2oGPTe variables
         q.app.remote_address = os.getenv("H2OGPTE_ADDRESS", "https://playground.h2ogpte.h2o.ai")
-        q.app.api_key = os.getenv("H2OGPTE_API_KEY", "")
-        #q.app.api_key = ""
+        #q.app.api_key = os.getenv("H2OGPTE_API_KEY", "")
+        q.app.api_key = "sk-xiLWgkUpY1Dkas9qbNG1nGymXfAOHOtvx5hu65yQ5gjcxHEt"
         q.app.collection_name = os.getenv("COLLECTION_NAME", "Safety Events")
         #print(f"h2ogpte api key: {q.app.api_key}")
 
@@ -298,7 +282,7 @@ async def init(q: Q) -> None:
     )
     q.page["header"] = ui.header_card(
         box="header",
-        title="Patient and Employee Healthcare Safety Event Classifier v0.0.2",
+        title="Patient and Employee Healthcare Safety Event Classifier v0.0.3",
         subtitle="Powered by Open Source and Enterprise H2oGPTe",
         #image="https://cloud.h2o.ai/logo.svg",
         color = 'card',
@@ -354,73 +338,6 @@ async def init(q: Q) -> None:
     )
 
     await nav_home(q)
-
-
-
-async def edit_layout(q: Q) -> None:
-    q.client.cards = []
-
-    # fec925
-    q.page["meta"] = ui.meta_card(
-        box="",
-        title="Patient and Employee Healthcare Safety Event Classifier",
-        themes = [ui.theme(
-            name='h2o-dark-custom',
-            primary='#fec925',
-            text='#ffffff',
-            card='#000000',
-            page='#000000',
-        )],
-        theme="h2o-dark-custom",
-        layouts=[
-            ui.layout(
-                breakpoint="xs",
-                min_height="100vh",
-                max_width="1500px",
-                zones=[
-                    ui.zone("header"),
-                    ui.zone(
-                        "content",
-                        size="1",
-                        direction=ui.ZoneDirection.ROW,
-                        zones=[
-                            ui.zone("navigation", size="20%"),
-                            ui.zone(name="main",
-                                    zones=[ui.zone(name="main_0", direction="column", size="50%"),
-                                           ui.zone(name="main_1", direction="column", size="50%")]
-
-                            ),
-                        ],
-                    ),
-                    ui.zone(name="footer"),
-                ],
-            )
-        ],
-    )
-    q.page["header"] = ui.header_card(
-        box="header",
-        title="Patient and Employee Healthcare Safety Event Classifier",
-        subtitle="Powered by Open Source and Enterprise H2oGPTe",
-        image="https://cloud.h2o.ai/logo.svg",
-    )
-    q.page["navigation"] = ui.nav_card(
-        box=ui.box("navigation", size=0),
-        items=[
-            ui.nav_group(
-                label="Menu",
-                items=[
-                    ui.nav_item("nav_home", "Home", "Home"),
-                    ui.nav_item("nav_import", "Event Upload/Review", "TableGroup"),
-                ],
-            ),
-        ],
-    )
-    q.page["footer"] = ui.footer_card(
-        box="footer", caption="Made with 💛 using [H2O Wave](https://wave.h2o.ai)."
-    )
-
-    await edit_data(q)
-
 
 
 
@@ -512,8 +429,6 @@ async def nav_home(q: Q):
         ],
     )
 
-    #(q.app.header_image,) = await q.site.upload(["safety-logo-500px.png"])
-    #print(f"image uploaded: {q.app.header_image}")
     q.page["home"] = ui.form_card(
         box="main",
         items=[
@@ -524,10 +439,6 @@ async def nav_home(q: Q):
             ui.text("3. Human-in-the-loop, generate a new h2oGPTe response for any event"),
             ui.text("4. Automatically generate and optionally edit an email for any event"),
             ui.text("5. Create and edit new prompts in the Prompt Catalog"),
-            #ui.message_bar(
-            #    type="info", text="It may take a few minutes to process your data."
-            #),
-            #ui.text(f'<center><img src="{q.app.header_image}"></center>'),
         ],
     )
     q.client.cards.append("home")
@@ -706,19 +617,6 @@ async def edit_data(q: Q):
         ],
     )
 
-    # q.page["edit_data0"] = ui.form_card(
-    #     box="main_0",
-    #     items=[ui.text_xl('Event Detail'),
-    #            ui.textbox(name='edited_description',
-    #                       label='Event Description',
-    #                       multiline=True,
-    #                       readonly=True,
-    #                       #value=q.client.original_data.iloc[int(q.args.preview_data[0])]['Event_Description']),
-    #                       value = q.client.original_data.iloc[int(q.client.preview_row)]['Event_Description']),
-    #
-    #     ]
-    # )
-
     q.client.prompt_catalog_class = q.client.prompt_catalog[q.client.prompt_catalog['Prompt_Type'] == 'classification']
     q.page["edit_data1"] = ui.form_card(
         box="main_1",
@@ -751,20 +649,19 @@ async def edit_data(q: Q):
                                        sortable=True) if col == 'Prompt_ID'
                        else ui.table_column(col, col.replace("_", " "), sortable=True, cell_overflow='tooltip')
                        for col in
-                       q.client.prompt_catalog_class[['Prompt_ID', 'Prompt_Type', 'Prompt_Text', 'Default']].columns
+                       q.client.prompt_catalog[['Prompt_ID', 'Prompt_Type', 'Prompt_Text', 'Default']].columns
                    ],
                    rows=[
                        ui.table_row(
                            str(i),
                            [
-                               str(q.client.prompt_catalog_class[['Prompt_ID', 'Prompt_Type', 'Prompt_Text', 'Default']].loc[
-                                       i, col])
+                               str(q.client.prompt_catalog[['Prompt_ID', 'Prompt_Type', 'Prompt_Text', 'Default']].loc[i, col])
                                for col in
-                               q.client.prompt_catalog_class[['Prompt_ID', 'Prompt_Type', 'Prompt_Text', 'Default']].columns
+                               q.client.prompt_catalog[['Prompt_ID', 'Prompt_Type', 'Prompt_Text', 'Default']].columns
                            ],
                        )
                        for i in
-                       range(len(q.client.prompt_catalog_class[['Prompt_ID', 'Prompt_Type', 'Prompt_Text', 'Default']]))
+                       range(len(q.client.prompt_catalog[['Prompt_ID', 'Prompt_Type', 'Prompt_Text', 'Default']]))
                    ],
                    value='0'
                ),
@@ -785,20 +682,7 @@ async def edit_data(q: Q):
         ]
     )
 
-    # q.page["edit_data2"] = ui.form_card(
-    #     box="buttons",
-    #     items=[ui.buttons(justify='end', items=[
-    #                 ui.button(name="cancel_preview_edits", label="Cancel and Return to Preview"),
-    #                 ui.button(name="save_preview_edits", label="Save Edited Event", primary=True),
-    #                 ui.button(name="send_preview_email", label="Send Email", primary=True)
-    #                 ])
-    #     ]
-    # )
-
     q.client.cards.append("edit_data1")
-    # q.client.cards.append("edit_data0")
-    # q.client.cards.append("edit_data2")
-
 
 
 @on()
@@ -1173,4 +1057,6 @@ def clear_cards(q: Q):
         del q.page[card]
 
     q.client.cards = []
+
+
 
